@@ -8,10 +8,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface BusService {
-    Page<Bus> searchBuses(String fromLocation, String toLocation, LocalDate travelDate, Pageable pageable);
+    Page<Bus> searchAllBuses(String fromLocation, String toLocation, LocalDate travelDate,int page, int size, String sortBy, String sortDir);
 
     Bus createBus(Bus bus);
     List<Bus> createBuses(List<Bus> buses);
+
 
 
 }

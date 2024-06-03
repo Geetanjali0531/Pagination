@@ -5,14 +5,12 @@ import com.pagination.entity.Bus;
 import com.pagination.service.BusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -23,7 +21,7 @@ public class BusController {
     private BusService busService;
 
     @GetMapping("/search")
-    public ResponseEntity<Page<Bus>> searchBuses(
+    public ResponseEntity<?> searchBuses(
             @RequestParam String fromLocation,
             @RequestParam String toLocation,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate travelDate,
@@ -32,10 +30,17 @@ public class BusController {
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
 
-        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Bus> busPage = busService.searchBuses(fromLocation, toLocation, travelDate, pageable);
-        return ResponseEntity.ok(busPage);
+        Page<Bus> buses = busService.searchAllBuses(fromLocation, toLocation, travelDate, page, size, sortBy, sortDir);
+
+        HashMap<String, Object> hm = new HashMap<>();
+        hm.put("content", buses.getContent());
+        hm.put("pageNo", buses.getNumber());
+        hm.put("pageSize", buses.getSize());
+        hm.put("total-Elements", buses.getTotalElements());
+        hm.entrySet().stream().forEach(x -> System.out.println(x.getKey() + x.getValue()));
+        return ResponseEntity.ok().body(hm);
+
+
     }
 
 
